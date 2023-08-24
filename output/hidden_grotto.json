@@ -1,0 +1,371 @@
+{
+  "Route 5": {
+    "Guaranteed Encounters": [
+      {
+        "pokemon": "Stantler",
+        "level": 30,
+        "forced-first": true
+      }
+    ],
+    "Common Encounters": [
+      "Pachirisu",
+      "Liepard",
+      "Minccino",
+      "Sigilyph"
+    ],
+    "Uncommon Encounters": [
+      "Nidorina",
+      "Nidorino",
+      "Gothorita",
+      "Duosion"
+    ],
+    "Rare Encounters": [
+      "Squirtle",
+      "Totodile",
+      "Stantler"
+    ]
+  },
+  "Lostlorn Forest": {
+    "Rare Encounters": [
+      "Bulbasaur",
+      "Treecko",
+      "Scyther"
+    ],
+    "Common Encounters": [
+      "Pansage",
+      "Pansear",
+      "Panpour",
+      "Burmy"
+    ],
+    "Uncommon Encounters": [
+      "Heracross",
+      "Pinsir",
+      "Goldeen",
+      "Exeggcute"
+    ]
+  },
+  "Route 6 - Driftveil Entrance": {
+    "Rare Encounters": [
+      "Snover",
+      "Chikorita",
+      "Turtwig"
+    ],
+    "Common Encounters": [
+      "Shroomish",
+      "Hoothoot",
+      "Natu",
+      "Mankey"
+    ],
+    "Uncommon Encounters": [
+      "Tympole",
+      "Mime Jr.",
+      "Bonsly",
+      "Yanma"
+    ]
+  },
+  "Route 6 - Mistralton Cave Entrance": {
+    "Rare Encounters": [
+      "Gible",
+      "Cyndaquil",
+      "Torchic"
+    ],
+    "Common Encounters": [
+      "Rhyhorn",
+      "Onix",
+      "Whismur",
+      "Geodude"
+    ],
+    "Uncommon Encounters": [
+      "Gurdurr",
+      "Aron",
+      "Nosepass",
+      "Tyrogue"
+    ]
+  },
+  "Floccesy Ranch": {
+    "Rare Encounters": [
+      "Ponyta",
+      "Houndour",
+      "Miltank",
+      "Tauros"
+    ],
+    "Common Encounters": [
+      "Azumarill",
+      "Herdier",
+      "Quagsire",
+      "Swellow"
+    ],
+    "Uncommon Encounters": [
+      "Zebstrika",
+      "Watchog",
+      "Dunsparce"
+    ]
+  },
+  "Route 7": {
+    "Rare Encounters": [
+      "Sneasel",
+      "Charmander",
+      "Chimchar"
+    ],
+    "Common Encounters": [
+      "Swinub",
+      "Snorunt",
+      "Phanpy",
+      "Aipom"
+    ],
+    "Uncommon Encounters": [
+      "Cubchoo",
+      "Spinda",
+      "Zangoose",
+      "Seviper"
+    ]
+  },
+  "Abundant Shrine - Entrance": {
+    "Rare Encounters": [
+      "Eevee",
+      "Slowpoke",
+      "Vulpix",
+      "Abra"
+    ],
+    "Common Encounters": [
+      "Oddish",
+      "Psyduck",
+      "Pineco",
+      "Swablu"
+    ],
+    "Uncommon Encounters": [
+      "Qwilfish",
+      "Corphish",
+      "Budew",
+      "Marill"
+    ]
+  },
+  "Abundant Shrine - Back Pond near Shrine": {
+    "Rare Encounters": [
+      "Dratini",
+      "Poliwag"
+    ],
+    "Common Encounters": [
+      "Swablu",
+      "Alomomola"
+    ],
+    "Uncommon Encounters": [
+      "Corphish",
+      "Krabby",
+      "Qwilfish",
+      "Carvanha"
+    ]
+  },
+  "Route 13 - Near Cobalion's Grove": {
+    "Rare Encounters": [
+      "Mudkip",
+      "Piplup",
+      "Staryu"
+    ],
+    "Common Encounters": [
+      "Hoppip",
+      "Zigzagoon",
+      "Lunatone",
+      "Solrock"
+    ],
+    "Uncommon Encounters": [
+      "Zubat",
+      "Taillow",
+      "Luvdisc",
+      "Wingull"
+    ]
+  },
+  "Route 9": {
+    "Rare Encounters": [
+      "Ralts",
+      "Magnemite",
+      "Golett",
+      "Munchlax"
+    ],
+    "Common Encounters": [
+      "Croagunk",
+      "Scraggy",
+      "Poochyena",
+      "Gulpin"
+    ],
+    "Uncommon Encounters": [
+      "Bellsprout",
+      "Druddigon",
+      "Houndour",
+      "Grimer"
+    ]
+  },
+  "Route 22": {
+    "Rare Encounters": [
+      "Mienfoo",
+      "Delibird",
+      "Gligar",
+      "Corsola"
+    ],
+    "Common Encounters": [
+      "Venonat",
+      "Ledyba",
+      "Spinarak",
+      "Shuckle"
+    ],
+    "Uncommon Encounters": [
+      "Surskit",
+      "Skitty",
+      "Shelmet",
+      "Karrablast"
+    ]
+  },
+  "Giant Chasm": {
+    "Rare Encounters": [
+      "Drilbur",
+      "Beldum",
+      "Ditto",
+      "Roggenrola"
+    ],
+    "Common Encounters": [
+      "Clefairy",
+      "Absol",
+      "Drowzee",
+      "Castform"
+    ],
+    "Uncommon Encounters": [
+      "Porygon",
+      "Jynx",
+      "Buneary",
+      "Vanillish"
+    ]
+  },
+  "Route 13 - Outside Giant Chasm": {
+    "Rare Encounters": [
+      "Feebas",
+      "Drifloon",
+      "Togepi",
+      "Happiny"
+    ],
+    "Common Encounters": [
+      "Kecleon",
+      "Farfetch'd",
+      "Shellos-E",
+      "Shellos-W"
+    ],
+    "Uncommon Encounters": [
+      "Seel",
+      "Spheal",
+      "Snorunt",
+      "Horsea"
+    ]
+  },
+  "Route 23": {
+    "Rare Encounters": [
+      "Glameow",
+      "Stunky",
+      "Tauros",
+      "Gastly"
+    ],
+    "Common Encounters": [
+      "Zangoose",
+      "Seviper",
+      "Throh",
+      "Sawk"
+    ],
+    "Uncommon Encounters": [
+      "Teddiursa",
+      "Tropius",
+      "Wooper",
+      "Smeargle"
+    ]
+  },
+  "Pinwheel Forest - Deep in the Woods": {
+    "Rare Encounters": [
+      "Breloom",
+      "Scolipede"
+    ],
+    "Common Encounters": [
+      "Amoonguss",
+      "Murkrow",
+      "Pinsir",
+      "Scyther"
+    ],
+    "Uncommon Encounters": [
+      "Beedrill",
+      "Butterfree"
+    ]
+  },
+  "Pinwheel Forest - Challenger's Rock": {
+    "Rare Encounters": [
+      "Ledian",
+      "Ariados"
+    ],
+    "Common Encounters": [
+      "Poliwhirl",
+      "Hariyama",
+      "Medicham",
+      "Shelgon"
+    ],
+    "Uncommon Encounters": [
+      "Wormadam",
+      "Mothim"
+    ]
+  },
+  "Route 3 - In the Dark, Doubles Grass": {
+    "Rare Encounters": [
+      "Ninetales",
+      "Arcanine"
+    ],
+    "Common Encounters": [
+      "Pachirisu",
+      "Manectric",
+      "Zebstrika",
+      "Luxray"
+    ],
+    "Uncommon Encounters": [
+      "Lombre",
+      "Nuzleaf"
+    ]
+  },
+  "Route 3 - Over the Clear, Blue Pond": {
+    "Rare Encounters": [
+      "Flaaffy",
+      "Mightyena"
+    ],
+    "Common Encounters": [
+      "Bibarel",
+      "Venonat",
+      "Lombre",
+      "Masquerain"
+    ],
+    "Uncommon Encounters": [
+      "Basculin",
+      "Lanturn"
+    ]
+  },
+  "Route 2": {
+    "Rare Encounters": [
+      "Dunsparce",
+      "Kricketune"
+    ],
+    "Common Encounters": [
+      "Watchog",
+      "Nidorino",
+      "Nidorina",
+      "Granbull"
+    ],
+    "Uncommon Encounters": [
+      "Primeape",
+      "Herdier"
+    ]
+  },
+  "Route 18": {
+    "Rare Encounters": [],
+    "Common Encounters": [
+      "Kingler",
+      "Crawdaunt",
+      "Chatot",
+      "Dragonite"
+    ],
+    "Uncommon Encounters": [
+      "Feebas",
+      "Crustle"
+    ]
+  }
+}
