@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Route Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>Route Data</h1>
+    <table>
+        <tr>
+            <th>Area</th>
+            <th>Habitat</th>
+            <th>Subcategory</th>
+            <th>Pokemon</th>
+        </tr>
+        {% for area, details in data.items() %}
+            {% set area_size = namespace(value=0) %} {# namespace to work around scoping #}
+            {% for habitat, subcategories in details.items() %}
+                {% if subcategories is mapping %}
+                    {% for subcategory, pokemon_list in subcategories.items() %}
+                        {% set area_size.value = area_size.value + pokemon_list|length %}
+                    {% endfor %}
+                {% else %}
+                    {% set area_size.value = area_size.value + subcategories|length %}
+                {% endif %}
+            {% endfor %}
+
+            {% for habitat, subcategories in details.items() %}
+                {% set area_first = loop.first %}
+
+                {% set habitat_size = namespace(value=0) %} {# as above #}
+                {% if subcategories is mapping %}
+                    {% for subcategory, pokemon_list in subcategories.items() %}
+                        {% set habitat_size.value  = habitat_size.value  + pokemon_list|length %}
+                    {% endfor %}
+                {% else %}
+                    {% set habitat_size.value  = habitat_size.value  + subcategories|length %}
+                {% endif %}
+
+                {% if subcategories is mapping %}
+                    {% for subcategory, pokemon_list in subcategories.items() %}
+                        {% set habitat_first = loop.first %}
+
+                        {% for pokemon in pokemon_list %}
+                            {% set subcat_first = loop.first %}
+
+                            <tr>
+                                {% if area_first and habitat_first and subcat_first %}
+                                    <td rowspan="{{ area_size.value }}">{{ area }}</td>
+                                {% endif %}
+                                {% if habitat_first and subcat_first %}
+                                    <td rowspan="{{ habitat_size.value }}">{{ habitat }}</td>
+                                {% endif %}
+                                {% if subcat_first %}
+                                    <td rowspan="{{ pokemon_list|length }}">{{ subcategory }}</td>
+                                {% endif %}
+                                <td>{{ pokemon['pokemon'] }} ({{ pokemon['chance_pct'] }}%)</td>
+                            </tr>
+                        {% endfor %}
+                    {% endfor %}
+                {% else %}
+                    {% for pokemon in subcategories %}
+                        {% set habitat_first = loop.first %}
+                        <tr>
+                            {% if area_first and habitat_first %}
+                                <td rowspan="{{ area_size.value }}">{{ area }}</td>
+                            {% endif %}
+                            {% if habitat_first %}
+                                <td rowspan="{{ habitat_size.value }}">{{ habitat }}</td>
+                                <td rowspan="{{ habitat_size.value }}"></td>
+                            {% endif %}
+                            <td>{{ pokemon['pokemon'] }} ({{ pokemon['chance_pct'] }}%)</td>
+                        </tr>
+                    {% endfor %}
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+    </table>
+</body>
+</html>
