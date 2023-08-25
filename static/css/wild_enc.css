@@ -1,0 +1,32 @@
+body {
+    background-color: #1e1e1e;
+    color: #e0dede;
+    font-family: 'pokmon_black_white_black_2_Rg';
+    font-size: 20px;
+}
+
+.container {
+    width: 800px;
+    margin: auto;
+}
+
+.area-cell h2 {
+    font-size: 32px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th, td {
+    border: 1px solid #ffffff;
+    padding: 8px;
+    text-align: center;
+}
+
+.sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+}

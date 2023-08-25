@@ -1,0 +1,6 @@
+{% macro make(pokemon) %}
+<div>
+{{ pokemon.pokemon }} ({{ pokemon.chance_pct }}%)
+</div>
+<input type="checkbox" class="caught-checkbox" name="{{pokemon.pokemon}}">
+{% endmacro %}

@@ -2,20 +2,15 @@
 <html>
 <head>
     <title>Route Data</title>
-    <style>
-        table {
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 8px;
-            text-align: center;
-        }
-    </style>
+    <script src="{{ url_for('static', filename='js/wild_enc.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wild_enc.css') }}">
 </head>
 <body>
+<div class="container">
     <h1>Route Data</h1>
     <table>
+        {% import 'pokemon_cell.html' as pokecell %}
         <tr>
             <th>Area</th>
             <th>Habitat</th>
@@ -55,15 +50,15 @@
 
                             <tr>
                                 {% if area_first and habitat_first and subcat_first %}
-                                    <td rowspan="{{ area_size.value }}">{{ area }}</td>
+                                    <td rowspan="{{ area_size.value }}" class="area-cell">{{ area }}</td>
                                 {% endif %}
                                 {% if habitat_first and subcat_first %}
-                                    <td rowspan="{{ habitat_size.value }}">{{ habitat }}</td>
+                                    <td rowspan="{{ habitat_size.value }}" class="habitat-cell">{{ habitat }}</td>
                                 {% endif %}
                                 {% if subcat_first %}
-                                    <td rowspan="{{ pokemon_list|length }}">{{ subcategory }}</td>
+                                    <td rowspan="{{ pokemon_list|length }}" class="subcat-cell">{{ subcategory }}</td>
                                 {% endif %}
-                                <td>{{ pokemon['pokemon'] }} ({{ pokemon['chance_pct'] }}%)</td>
+                                <td class="pokemon-cell">{{ pokecell.make(pokemon) }}</td>
                             </tr>
                         {% endfor %}
                     {% endfor %}
@@ -72,18 +67,19 @@
                         {% set habitat_first = loop.first %}
                         <tr>
                             {% if area_first and habitat_first %}
-                                <td rowspan="{{ area_size.value }}">{{ area }}</td>
+                                <td rowspan="{{ area_size.value }}" class="area-cell">{{ area }}</td>
                             {% endif %}
                             {% if habitat_first %}
-                                <td rowspan="{{ habitat_size.value }}">{{ habitat }}</td>
-                                <td rowspan="{{ habitat_size.value }}"></td>
+                                <td rowspan="{{ habitat_size.value }}" class="habitat-cell">{{ habitat }}</td>
+                                <td rowspan="{{ habitat_size.value }}" class="subcat-cell blank"></td>
                             {% endif %}
-                            <td>{{ pokemon['pokemon'] }} ({{ pokemon['chance_pct'] }}%)</td>
+                            <td class="pokemon-cell">{{ pokecell.make(pokemon) }}</td>
                         </tr>
                     {% endfor %}
                 {% endif %}
             {% endfor %}
         {% endfor %}
     </table>
+</div>
 </body>
 </html>
