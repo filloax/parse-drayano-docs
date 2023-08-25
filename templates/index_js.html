@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Route Data</title>
+    <script src="{{ url_for('static', filename='js/wild_enc_fill.js') }}"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wild_enc.css') }}">
+    <script>
+        function getDataPath() {
+            return "{{ url_for('static', filename='data/' + filename + '.json') }}"
+        }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1>Route Data</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Area</th>
+                <th>Habitat</th>
+                <th>Subcategory</th>
+                <th>Pokemon</th>
+            </tr>
+        </thead>
+        <tbody id="main-table">
+
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

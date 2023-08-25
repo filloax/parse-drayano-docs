@@ -13,11 +13,11 @@ document.addEventListener("DOMContentLoaded", function() {
 
     document.querySelectorAll('td.area-cell').forEach(el => {
         const content = el.innerHTML
-        el.innerHTML = `<div class="sticky"><h2>${content}</h3></div>`
+        el.innerHTML = html`<div class="sticky"><h2>${content}</h3></div>`
     });
     document.querySelectorAll('td.habitat-cell').forEach(el => {
         const content = el.innerHTML
-        el.innerHTML = `<div class="sticky"><h3>${content}</h3></div>`
+        el.innerHTML = html`<div class="sticky"><h3>${content}</h3></div>`
     });
     document.querySelectorAll('input.caught-checkbox').forEach(el => {
         el.checked = isCaught(el.name)
