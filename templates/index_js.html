@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/wild_enc.css') }}">
     <script>
         function getDataPath() {
-            return "{{ url_for('static', filename='data/' + filename + '.json') }}"
+            return "{{ url_for('static', filename='data/') }}"
         }
     </script>
 </head>
@@ -23,7 +23,7 @@
                 <th>Pokemon</th>
             </tr>
         </thead>
-        <tbody id="main-table">
+        <tbody class="wild-area-table" id="{{filename}}">
 
         </tbody>
     </table>

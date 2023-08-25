@@ -2,20 +2,22 @@ const STORAGE_KEY = "OakTrackerData"
 var data = null
 
 document.addEventListener("DOMContentLoaded", function() {
-    let dataPath = `data/main.json`
+    let dataPath = `data`
     if (typeof getDataPath === 'function') {
         dataPath = getDataPath()
     } else {
         console.log(`getDataPath function not defined in template, will use ${dataPath} as default`)
     }
-    const table = document.getElementById('main-table')
-    fetch(dataPath).then(response => response.json().then(data => {
-        table.innerHTML = Object.entries(data).map(([location, habitatMap]) => 
-            renderLocationData(location, habitatMap)
-        ).join('');
-
-        initStorageAndEvents();
-    }));
+    document.querySelectorAll('.wild-area-table').forEach((table) => {
+        const filename = table.id
+        fetch(`${dataPath}/${filename}.json`).then(response => response.json().then(data => {
+            table.innerHTML = Object.entries(data).map(([location, habitatMap]) => 
+                renderLocationData(location, habitatMap)
+            ).join('');
+    
+            initStorageAndEvents();
+        }));
+    })
 });
 
 /**

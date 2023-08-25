@@ -9,8 +9,11 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/main')
 def index():
-    with open(os.path.join(data_dir, 'main.json'), 'r', encoding='utf-8') as f:
-        return render_template('index_js.html', filename='main')
+    return render_template('index_js.html', filename='main')
+
+@app.route('/postgame')
+def postgame():
+    return render_template('index_js.html', filename='postgame')
 
 if __name__ == '__main__':
     app.debug = True
