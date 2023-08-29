@@ -122,6 +122,12 @@ function isCaught(name) {
     return data[name] == true
 }
 
+function applyLoadedData() {
+    document.querySelectorAll('input.caught-checkbox').forEach(el => {
+        el.checked = isCaught(el.name)
+    });
+}
+
 function initStorageAndEvents() {
     let strData = localStorage.getItem(STORAGE_KEY)
     if (strData === null) {
@@ -199,6 +205,35 @@ function initStorageAndEvents() {
             el.dataset.collapsed = String(newCollapsed)
         });
     });
+
+    document.getElementById('download').addEventListener('click', () => {
+        console.log(data)
+        let dl = document.createElement('a')
+        dl.download = 'tracker-data.json'
+        dl.href = `data:application/json;charset=utf-8,${JSON.stringify(data)}`
+        dl.click()
+    });
+
+    const getJsonUpload = () => new Promise(resolve => {
+        const inputFileElement = document.createElement('input')
+        inputFileElement.setAttribute('type', 'file')
+        inputFileElement.setAttribute('accept', '.json')
+        
+        inputFileElement.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (!file) return
+
+            resolve(await file.text())
+        }, false);
+        inputFileElement.click()
+    });
+
+    document.getElementById('upload-button').onclick = async () => {
+        const jsonFile = await getJsonUpload()
+        data = JSON.parse(jsonFile)
+        localStorage.setItem(STORAGE_KEY, jsonFile)
+        applyLoadedData()
+    }
 }
 
 /** @param {HTMLElement} element */
