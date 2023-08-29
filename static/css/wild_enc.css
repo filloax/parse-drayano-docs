@@ -30,3 +30,17 @@ th, td {
     position: sticky;
     top: 0;
 }
+
+.hidden {
+    display: none;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    color: yellow;
+    text-decoration: underline;
+    background-color: #ffffff11;
+}
