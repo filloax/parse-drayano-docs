@@ -3,9 +3,10 @@ import re
 from tqdm import tqdm
 from typing import TypedDict
 import json
+import sys
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
-WILD_AREA_FILE = os.path.join(ROOT, 'Documentation', 'Wild Area Changes.txt')
+WILD_AREA_FILE_DEFAULT = os.path.join(os.path.dirname(__file__), 'data', 'Wild Area Changes.txt')
 
 SECTION_SEP_PATTERN = r'===+'
 SECTION_FILES = {
@@ -91,7 +92,7 @@ def decolumn_file(filename: str) -> str:
     return outfile
 
 AREA_NAME_PATTERN = r'~~~+\s*(?P<name>.+?)\s*~~~+'
-CATEGORY_PATTERN = r'(?P<main>[^,]+)(?:,\s*(?P<kind>.+))?' # only for getting, not checking as works with any string
+CATEGORY_PATTERN = r'(?P<main>[^,]+)(?:,\s*(?P<kind>.+?))?\s*:?$' # only for getting, not checking as works with any string
 CATEGORY_SEP_PATTERN = r'----+'
 
 def parse_wild_area_section(section_filename):
@@ -100,11 +101,34 @@ def parse_wild_area_section(section_filename):
     data = {}
     current_location = ""
     current_category = ""
-    current_subcategory = ""
+    current_subcategory = None
     current_entries = []
     # This needs lookbehind of two lines, to detect categories as strings followed by ------. Sigh.
     # Two elements, [last one, second-to-last]
     buffer = []
+
+    def insert_current():
+        nonlocal current_entries, current_location, current_category, current_subcategory
+
+        if current_location == '' or current_category == '': return
+
+        while len(buffer) > 0:
+            check_old_line(buffer.pop(), current_entries)
+        
+        if current_location not in data:
+            data[current_location] = {}
+        if current_category not in data[current_location] and current_subcategory is not None:
+            data[current_location][current_category] = {}
+        if current_subcategory is None:
+            if current_category not in data[current_location]:
+                data[current_location][current_category] = current_entries.copy()
+            else:
+                union_in_place(data[current_location][current_category], current_entries)
+        else:
+            if current_subcategory not in data[current_location][current_category]:
+                data[current_location][current_category][current_subcategory] = current_entries.copy()
+            else:
+                union_in_place(data[current_location][current_category][current_subcategory], current_entries)
 
     with open(section_filename, 'r', encoding='utf-8') as file:
         # for line in file:
@@ -115,27 +139,21 @@ def parse_wild_area_section(section_filename):
             
             area_match = re.match(AREA_NAME_PATTERN, line)
             if area_match:
+                insert_current()
+                current_entries = []
                 current_location = area_match.group('name')
                 insert_in_buffer = False
             elif line == "" and current_location != "" and current_category != "":
-                # consume buffer and check all old entries before "saving" category
-                while len(buffer) > 0:
-                    check_old_line(buffer.pop(), current_entries)
-                
-                if current_location not in data:
-                    data[current_location] = {}
-                if current_category not in data[current_location] and current_subcategory is not None:
-                    data[current_location][current_category] = {}
-                if current_subcategory is None:
-                    data[current_location][current_category] = current_entries
-                else:
-                    data[current_location][current_category][current_subcategory] = current_entries
                 insert_in_buffer = False
+                # insert_current()
             elif re.match(CATEGORY_SEP_PATTERN, line) and len(buffer) > 0:
                 # Is category sep, then last line was category
                 category_line = buffer.pop(0)
                 insert_in_buffer = False
                 category_match = re.match(CATEGORY_PATTERN, category_line)
+
+                insert_current()
+
                 current_category = category_match.group('main')
                 current_subcategory = category_match.group('kind')
                 current_entries = []
@@ -146,9 +164,13 @@ def parse_wild_area_section(section_filename):
                     # When sure that they are not categories, parse entries
                     check_old_line(buffer.pop(), current_entries)
 
+    insert_current()
     remove_empty_from_dict(data)
 
     return data
+
+def union_in_place(list1: list, list2: list):
+    list1.extend([x for x in list2 if x not in list1])
 
 # Pidove Lv. 05-07 20%
 ENC_PATTERN = r'(?P<mon>.+?)\s+Lv.\s+(?P<lvmin>\d+)(?:-(?P<lvmax>\d+))?(?:\s+(?P<notes>.+))?\s+(?P<pct>[\d-]+)%'
@@ -194,21 +216,22 @@ def remove_empty_from_dict(data: dict):
     # Remove empty
     locations = list(data.keys())
     for location in locations:
-        if len(data[location]) == 0:
-            del data[location]
-            continue
         categories = list(data[location].keys())
         for category in categories:
+            if type(data[location][category]) is dict:
+                subcategories = list(data[location][category].keys())
+                for subcategory in subcategories:
+                    if len(data[location][category][subcategory]) == 0:
+                        del data[location][category][subcategory]
+                        continue
             if len(data[location][category]) == 0:
                 del data[location][category]
                 continue
-            if type(data[location][category]) is not dict:
-                continue
-            subcategories = list(data[location][category].keys())
-            for subcategory in subcategories:
-                if len(data[location][category][subcategory]) == 0:
-                    del data[location][category][subcategory]
-                    continue
+
+        if len(data[location]) == 0:
+            del data[location]
+            continue
+
     
 LIST_START_PATTERN = r'^(?P<category>.+?):'
 LIST_ENTRY_PATTERN = r'^-\s+(?P<entry>.+)'
@@ -287,10 +310,14 @@ def work(original_file, workdir, outdir):
 def main():
     script_dir = os.path.dirname(__file__)
     data_dir = os.path.join(script_dir, 'data')
-    out_dir = os.path.join(script_dir, 'output')
+    out_dir = os.path.join(script_dir, 'static/data')
     os.makedirs(data_dir, exist_ok=True)
     os.makedirs(out_dir, exist_ok=True)
-    work(WILD_AREA_FILE, data_dir, out_dir)
+    if len(sys.argv) > 1:
+        file = sys.argv[1]
+    else:
+        file = WILD_AREA_FILE_DEFAULT
+    work(file, data_dir, out_dir)
     print(f"Done!")
 
 if __name__ == '__main__':

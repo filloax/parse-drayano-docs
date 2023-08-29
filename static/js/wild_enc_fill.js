@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function() {
             table.innerHTML = Object.entries(data).map(([location, habitatMap]) => 
                 renderLocationData(location, habitatMap)
             ).join('');
+            buildLocationTrees();
     
             initStorageAndEvents();
         }));
@@ -35,32 +36,41 @@ function renderLocationData(location, habitatMap) {
         id="${locationId}"
         >${location}</td>`
     
-    return Object.entries(habitatMap).map(([habitatName, habitatContent], locIndex) => {
-        const habitatPkmnNum = countHabitatMembers(habitatContent)
-        const locFirst = locIndex === 0
+    let _locFirst = true
+    return Object.entries(habitatMap).map(([habitatName, habitatContent]) => {
+        const locFirst = _locFirst
+        _locFirst = false
 
+        const habitatPkmnNum = countHabitatMembers(habitatContent)
+
+        const noSubcat = Array.isArray(habitatContent)
         const habitatId = slugify(habitatName) + "-" + slugify(location) + "-hab-cell"
         const habitatCell = /*html*/`<td 
             rowspan="${habitatPkmnNum}" 
             class="habitat-cell" 
             id="${habitatId}"
             data-loc="${locationId}"
+            ${noSubcat ? ` colspan="2"` : ''}
             >${habitatName}</td>`
 
-        if (Array.isArray(habitatContent)) {
-            return habitatContent.map((monData, index) => {
-                const first = index === 0
+        if (noSubcat) {
+            let _first = true
+            return habitatContent.map(monData => {
+                const first = _first
+                _first = false
                 return /*html*/`<tr>
                     ${(locFirst && first) ? locationCell : ''}
                     ${(first) ? habitatCell : ''}
-                    ${(first) ? /*html*/`<td rowspan="${habitatPkmnNum}" class="subcat-cell blank"></td>` : ''}
-                    <td data-loc="${locationId}" data-hab="${habitatId}">${renderMonData(monData)}</td>
+                    <td data-loc="${locationId}" data-hab="${habitatId}" class="poke-cell">${renderMonData(monData)}</td>
                 </tr>`
             }).join('');
         } else {
-            return Object.entries(habitatContent).map(([subcatName, mons], habitatIndex) => {
+            let _habitatFirst = true
+            return Object.entries(habitatContent).map(([subcatName, mons]) => {
+                const habitatFirst = _habitatFirst
+                _habitatFirst = false
+                
                 const num = mons.length
-                const habitatFirst = habitatIndex === 0
 
                 const subcatId = slugify(habitatName) + "-" + slugify(location) + "-" + slugify(subcatName) + "-sub-cell"
                 const subcatCell = /*html*/`<td 
@@ -71,13 +81,16 @@ function renderLocationData(location, habitatMap) {
                     data-hab="${habitatId}"
                     >${subcatName}</td>`
                 
-                return mons.map((monData, index) => {
-                    const first = index === 0
+                let _first = true
+                return mons.map(monData => {
+                    const first = _first
+                    _first = false
+
                     return /*html*/`<tr>
                         ${(locFirst && habitatFirst && first) ? locationCell : ''}
                         ${(habitatFirst && first) ? habitatCell : ''}
                         ${(first) ? subcatCell : ''}
-                        <td data-loc="${locationId}" data-hab="${habitatId}" data-sub="${subcatId}">${renderMonData(monData)}</td>
+                        <td data-loc="${locationId}" data-hab="${habitatId}" data-sub="${subcatId}" class="poke-cell">${renderMonData(monData)}</td>
                     </tr>`
                 }).join('');
             }).join('');
@@ -103,7 +116,7 @@ function countHabitatMembers(habitatContent) {
  */
 function renderMonData(monData) {
     return /*html*/`<div>
-    ${ monData.pokemon } (${ monData.chance_pct }%)
+    ${ monData.pokemon }${monData.chance_pct ? `  (${ monData.chance_pct }%)` : ''}
     </div>
     <input type="checkbox" class="caught-checkbox" name="${monData.pokemon}">
     `
@@ -122,10 +135,80 @@ function isCaught(name) {
     return data[name] == true
 }
 
+var locationTrees = {}
+var elementTrees = {}
+
+function buildLocationTrees() {
+    document.querySelectorAll('.area-cell').forEach(loc => {
+        const locObj = {};
+        locationTrees[loc.id] = {
+            'element': loc,
+            'map': locObj,
+        };
+        elementTrees[loc.id] = locationTrees[loc.id];
+        document.querySelectorAll(`.habitat-cell[data-loc="${loc.id}"]`).forEach(habitat => {
+            let habObj;
+            const subcategories = document.querySelectorAll(`.subcat-cell[data-hab="${habitat.id}"]`)
+
+            if (subcategories.length > 0) {
+                habObj = {};
+                locObj[habitat.id] = {
+                    'element': habitat,
+                    'map': habObj,
+                };
+            } else {
+                habObj = [];
+                locObj[habitat.id] = {
+                    'element': habitat,
+                    'list': habObj,
+                };
+            }
+            elementTrees[habitat.id] = locObj[habitat.id];
+            subcategories.forEach(subcat => {
+                if (subcat.classList.contains("blank")) {
+                    habObj[subcat.id] = {
+                        'element': subcat,
+                    };
+                    return;
+                }
+                const subcatList = []
+                habObj[subcat.id] = {
+                    'element': subcat,
+                    'list': subcatList,
+                }
+                elementTrees[subcat.id] = habObj[subcat.id];
+                document.querySelectorAll(`.poke-cell[data-sub="${subcat.id}"]`).forEach(poke => {
+                    subcatList.push(poke)
+                });
+            });
+
+            if (subcategories.length == 0) {
+                document.querySelectorAll(`.poke-cell[data-hab="${habitat.id}"]`).forEach(poke => {
+                    habObj.push(poke)
+                });
+            }
+        });
+    });
+}
+
 function applyLoadedData() {
     document.querySelectorAll('input.caught-checkbox').forEach(el => {
         el.checked = isCaught(el.name)
     });
+}
+
+function visitTree(tree, elementFunction, skipFirst=true) {
+    if (tree instanceof HTMLElement) {
+        if (!skipFirst) elementFunction(tree);
+    } else {
+        if (!skipFirst) elementFunction(tree.element);
+        if (tree.map) {
+            Object.values(tree.map).forEach(child => visitTree(child, elementFunction, false));
+        }
+        if (tree.list) {
+            tree.list.forEach(child => visitTree(child, elementFunction, false));
+        }
+    }
 }
 
 function initStorageAndEvents() {
@@ -158,49 +241,22 @@ function initStorageAndEvents() {
         });
     });
 
-    document.querySelectorAll('.area-cell').forEach(el => {
+    document.querySelectorAll('.area-cell,.habitat-cell,.subcat-cell').forEach(el => {
+        const collapsedWidth = el.classList.contains('area-cell') ? "4"
+            : el.classList.contains('habitat-cell') ? "3"
+            : el.classList.contains('subcat-cell') ? "2" : "1"
+        const originalWidth = el.colSpan || "1"
         el.dataset.collapsed = "false"
         el.classList.add("clickable")
         el.addEventListener('click', ev => {
             const collapsed = el.dataset.collapsed == "true"
             const newCollapsed = !collapsed
-            document.querySelectorAll(`[data-loc="${el.id}"]`).forEach(child => toggleVisibility(child, newCollapsed))
+            // document.querySelectorAll(`[data-loc="${el.id}"]`).forEach(child => toggleVisibility(child, newCollapsed))
+            visitTree(elementTrees[el.id], child => toggleVisibility(child, newCollapsed));
             if (newCollapsed)
-                el.colSpan = "4"
+                el.colSpan = collapsedWidth
             else
-                el.colSpan = "1"
-
-            el.dataset.collapsed = String(newCollapsed)
-        });
-    });
-
-    document.querySelectorAll('.habitat-cell').forEach(el => {
-        el.dataset.collapsed = "false"
-        el.classList.add("clickable")
-        el.addEventListener('click', ev => {
-            const collapsed = el.dataset.collapsed == "true"
-            const newCollapsed = !collapsed
-            document.querySelectorAll(`[data-hab="${el.id}"]`).forEach(child => toggleVisibility(child, newCollapsed))
-            if (newCollapsed)
-                el.colSpan = "3"
-            else
-                el.colSpan = "1"
-
-            el.dataset.collapsed = String(newCollapsed)
-        });
-    });
-
-    document.querySelectorAll('.subcat-cell').forEach(el => {
-        el.dataset.collapsed = "false"
-        el.classList.add("clickable")
-        el.addEventListener('click', ev => {
-            const collapsed = el.dataset.collapsed == "true"
-            const newCollapsed = !collapsed
-            document.querySelectorAll(`[data-sub="${el.id}"]`).forEach(child => toggleVisibility(child, newCollapsed))
-            if (newCollapsed)
-                el.colSpan = "2"
-            else
-                el.colSpan = "1"
+                el.colSpan = originalWidth
 
             el.dataset.collapsed = String(newCollapsed)
         });
@@ -228,12 +284,16 @@ function initStorageAndEvents() {
         inputFileElement.click()
     });
 
-    document.getElementById('upload-button').onclick = async () => {
+    document.getElementById('upload-button').addEventListener('click', async () => {
         const jsonFile = await getJsonUpload()
         data = JSON.parse(jsonFile)
         localStorage.setItem(STORAGE_KEY, jsonFile)
         applyLoadedData()
-    }
+    });
+
+    document.getElementById('collapse-all').addEventListener('click', () => {
+        document.querySelectorAll('.area-cell').forEach(el => el.click());
+    });
 }
 
 /** @param {HTMLElement} element */

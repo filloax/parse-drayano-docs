@@ -134,48 +134,8 @@
     }
   },
   "Route 8, Moor of Icirrus - All Seasons": {
-    "Cave": {
-      "Dust Cloud": [
-        {
-          "pokemon": "Steelix",
-          "chance_pct": 40,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Excadrill",
-          "chance_pct": 30,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Excadrill",
-          "chance_pct": 20,
-          "level_range": [
-            67,
-            67
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Excadrill",
-          "chance_pct": 10,
-          "level_range": [
-            69,
-            69
-          ],
-          "notes": null
-        }
-      ]
-    },
     "Swamps": {
-      "Normal:": [
+      "Normal": [
         {
           "pokemon": "Palpitoad",
           "chance_pct": 20,
@@ -469,7 +429,7 @@
       ]
     },
     "Swamps": {
-      "Normal:": [
+      "Normal": [
         {
           "pokemon": "Palpitoad",
           "chance_pct": 20,
@@ -905,7 +865,7 @@
           "notes": null
         }
       ],
-      "Shaking Spots:": [
+      "Shaking Spots": [
         {
           "pokemon": "Audino",
           "chance_pct": 50,
@@ -1269,7 +1229,7 @@
           "notes": null
         }
       ],
-      "Shaking Spots:": [
+      "Shaking Spots": [
         {
           "pokemon": "Audino",
           "chance_pct": 50,
@@ -1370,37 +1330,6 @@
     }
   },
   "Dragonspiral Tower - Indoors": {
-    "Fish": {
-      "Dark Spot": [
-        {
-          "pokemon": "Dragonair",
-          "chance_pct": 65,
-          "level_range": [
-            60,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Basculin-B",
-          "chance_pct": 30,
-          "level_range": [
-            60,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Dragonite",
-          "chance_pct": 5,
-          "level_range": [
-            65,
-            75
-          ],
-          "notes": null
-        }
-      ]
-    },
     "Floor": {
       "First Room, Normal": [
         {
@@ -1570,7 +1499,7 @@
       ]
     },
     "Roof": {
-      "Event Encounter:": [
+      "Event Encounter": [
         {
           "pokemon": "Reshiram",
           "chance_pct": null,
@@ -1593,30 +1522,118 @@
     }
   },
   "Twist Mountain - All Seasons": {
-    "Roof": {
-      "Event Encounter:": [
+    "Cave": {
+      "Normal": [
         {
-          "pokemon": "Reshiram",
-          "chance_pct": null,
+          "pokemon": "Boldore",
+          "chance_pct": 20,
           "level_range": [
-            75,
-            75
+            66,
+            66
           ],
-          "notes": "W2"
+          "notes": null
         },
         {
-          "pokemon": "Zekrom",
-          "chance_pct": null,
+          "pokemon": "Woobat",
+          "chance_pct": 20,
           "level_range": [
-            75,
-            75
+            62,
+            62
           ],
-          "notes": "B2"
+          "notes": null
+        },
+        {
+          "pokemon": "Donphan",
+          "chance_pct": 10,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Ursaring",
+          "chance_pct": 10,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Heatmor",
+          "chance_pct": 10,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Durant",
+          "chance_pct": 10,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Graveler",
+          "chance_pct": 5,
+          "level_range": [
+            66,
+            66
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Golbat",
+          "chance_pct": 5,
+          "level_range": [
+            66,
+            66
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Azumarill",
+          "chance_pct": 4,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Onix",
+          "chance_pct": 4,
+          "level_range": [
+            66,
+            66
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Azumarill",
+          "chance_pct": 1,
+          "level_range": [
+            69,
+            69
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Onix",
+          "chance_pct": 1,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
         }
-      ]
-    },
-    "Cave": {
-      "Ice Room, Normal:": [
+      ],
+      "Ice Room, Normal": [
         {
           "pokemon": "Cryogonal",
           "chance_pct": 20,
@@ -1708,7 +1725,36 @@
           "notes": null
         }
       ],
-      "Ice Room, Dust Cloud:": [
+      "Dust Cloud": [
+        {
+          "pokemon": "Excadrill",
+          "chance_pct": 60,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Excadrill",
+          "chance_pct": 30,
+          "level_range": [
+            69,
+            69
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Excadrill",
+          "chance_pct": 10,
+          "level_range": [
+            70,
+            70
+          ],
+          "notes": null
+        }
+      ],
+      "Ice Room, Dust Cloud": [
         {
           "pokemon": "Steelix",
           "chance_pct": 60,
@@ -1741,35 +1787,6 @@
   },
   "Underground Ruins - All Areas": {
     "Cave": {
-      "Ice Room, Dust Cloud:": [
-        {
-          "pokemon": "Steelix",
-          "chance_pct": 60,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Steelix",
-          "chance_pct": 30,
-          "level_range": [
-            69,
-            69
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Steelix",
-          "chance_pct": 10,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        }
-      ],
       "Normal": [
         {
           "pokemon": "Graveler",
@@ -2042,39 +2059,8 @@
     }
   },
   "Marvellous Bridge": {
-    "Cave": {
-      "Regi Rooms, Dust Cloud": [
-        {
-          "pokemon": "Excadrill",
-          "chance_pct": 75,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Onix",
-          "chance_pct": 20,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Steelix",
-          "chance_pct": 5,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        }
-      ]
-    },
     "Bridge": {
-      "Dark Spots:": [
+      "Dark Spots": [
         {
           "pokemon": "Swanna",
           "chance_pct": 40,
@@ -2160,91 +2146,6 @@
     }
   },
   "Route 15": {
-    "Bridge": {
-      "Dark Spots:": [
-        {
-          "pokemon": "Swanna",
-          "chance_pct": 40,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Pelipper",
-          "chance_pct": 10,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Fearow",
-          "chance_pct": 10,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Skiploom",
-          "chance_pct": 10,
-          "level_range": [
-            66,
-            66
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Pidgeotto",
-          "chance_pct": 10,
-          "level_range": [
-            66,
-            66
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Farfetch'd",
-          "chance_pct": 9,
-          "level_range": [
-            67,
-            67
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Chatot",
-          "chance_pct": 9,
-          "level_range": [
-            67,
-            67
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Swanna",
-          "chance_pct": 1,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Pelipper",
-          "chance_pct": 1,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        }
-      ]
-    },
     "Grass": {
       "Normal": [
         {
@@ -2466,7 +2367,7 @@
           "notes": null
         }
       ],
-      "Shaking Spots:": [
+      "Shaking Spots": [
         {
           "pokemon": "Audino",
           "chance_pct": 50,
@@ -2526,7 +2427,7 @@
   },
   "Pinwheel Forest - Inside": {
     "Grass": {
-      "Shaking Spots:": [
+      "Shaking Spots": [
         {
           "pokemon": "Audino",
           "chance_pct": 50,
@@ -2537,25 +2438,34 @@
           "notes": null
         },
         {
-          "pokemon": "Audino",
-          "chance_pct": 25,
-          "level_range": [
-            66,
-            66
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Emolga",
+          "pokemon": "Simisage",
           "chance_pct": 10,
           "level_range": [
-            65,
-            65
+            68,
+            68
           ],
           "notes": null
         },
         {
-          "pokemon": "Snorlax",
+          "pokemon": "Simisear",
+          "chance_pct": 10,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Simipour",
+          "chance_pct": 10,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Scizor",
           "chance_pct": 5,
           "level_range": [
             68,
@@ -2564,7 +2474,7 @@
           "notes": null
         },
         {
-          "pokemon": "Tyranitar",
+          "pokemon": "Slaking",
           "chance_pct": 5,
           "level_range": [
             68,
@@ -2573,7 +2483,16 @@
           "notes": null
         },
         {
-          "pokemon": "Gliscor",
+          "pokemon": "Raichu",
+          "chance_pct": 5,
+          "level_range": [
+            68,
+            68
+          ],
+          "notes": null
+        },
+        {
+          "pokemon": "Scolipede",
           "chance_pct": 5,
           "level_range": [
             68,
@@ -2801,80 +2720,6 @@
           ],
           "notes": null
         }
-      ],
-      "Shaking Spots": [
-        {
-          "pokemon": "Audino",
-          "chance_pct": 50,
-          "level_range": [
-            65,
-            65
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Simisage",
-          "chance_pct": 10,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Simisear",
-          "chance_pct": 10,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Simipour",
-          "chance_pct": 10,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Scizor",
-          "chance_pct": 5,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Slaking",
-          "chance_pct": 5,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Raichu",
-          "chance_pct": 5,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Scolipede",
-          "chance_pct": 5,
-          "level_range": [
-            68,
-            68
-          ],
-          "notes": null
-        }
       ]
     },
     "Surf": {
@@ -2999,37 +2844,6 @@
     }
   },
   "Pinwheel Forest - Outside": {
-    "Fish": {
-      "Dark Spot": [
-        {
-          "pokemon": "Goldeen",
-          "chance_pct": 60,
-          "level_range": [
-            55,
-            65
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Basculin-R",
-          "chance_pct": 30,
-          "level_range": [
-            60,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Seaking",
-          "chance_pct": 10,
-          "level_range": [
-            60,
-            70
-          ],
-          "notes": null
-        }
-      ]
-    },
     "Grass": {
       "Normal": [
         {
@@ -4023,30 +3837,8 @@
     }
   },
   "Dreamyard - All Areas": {
-    "Fish": {
-      "Dark Spot": [
-        {
-          "pokemon": "Psyduck",
-          "chance_pct": 70,
-          "level_range": [
-            50,
-            60
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Seaking",
-          "chance_pct": 30,
-          "level_range": [
-            60,
-            70
-          ],
-          "notes": null
-        }
-      ]
-    },
     "Grass": {
-      "Surface, Normal                   Grass, Surface, Doubles:": [
+      "Surface, Normal                   Grass, Surface, Doubles": [
         {
           "pokemon": "Watchog",
           "chance_pct": 20,
@@ -4138,7 +3930,7 @@
           "notes": "05%                         Munna Lv. 67"
         }
       ],
-      "Shaking Spots:": [
+      "Shaking Spots": [
         {
           "pokemon": "Audino",
           "chance_pct": 50,
@@ -4185,7 +3977,7 @@
           "notes": null
         }
       ],
-      "Basement, Doubles:": [
+      "Basement, Doubles": [
         {
           "pokemon": "Raticate",
           "chance_pct": 20,
@@ -4281,99 +4073,7 @@
   },
   "Route 2": {
     "Grass": {
-      "Basement, Doubles:": [
-        {
-          "pokemon": "Raticate",
-          "chance_pct": 20,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Golbat",
-          "chance_pct": 20,
-          "level_range": [
-            69,
-            69
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Munna",
-          "chance_pct": 10,
-          "level_range": [
-            65,
-            65
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Munna",
-          "chance_pct": 10,
-          "level_range": [
-            66,
-            66
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Venomoth",
-          "chance_pct": 10,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Kirlia",
-          "chance_pct": 10,
-          "level_range": [
-            66,
-            66
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Liepard",
-          "chance_pct": 5,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Persian",
-          "chance_pct": 5,
-          "level_range": [
-            70,
-            70
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Lunatone",
-          "chance_pct": 5,
-          "level_range": [
-            69,
-            69
-          ],
-          "notes": null
-        },
-        {
-          "pokemon": "Solrock",
-          "chance_pct": 5,
-          "level_range": [
-            69,
-            69
-          ],
-          "notes": null
-        }
-      ],
-      "Normal:": [
+      "Normal": [
         {
           "pokemon": "Watchog",
           "chance_pct": 20,
@@ -4682,7 +4382,7 @@
           "notes": null
         }
       ],
-      "Shaking Spots:": [
+      "Shaking Spots": [
         {
           "pokemon": "Audino",
           "chance_pct": 50,
@@ -5363,7 +5063,7 @@
       ]
     },
     "Grass": {
-      "Normal:": [
+      "Normal": [
         {
           "pokemon": "Watchog",
           "chance_pct": 22,
@@ -5446,7 +5146,7 @@
           "notes": null
         }
       ],
-      "Shaking Spots:": [
+      "Shaking Spots": [
         {
           "pokemon": "Audino",
           "chance_pct": 50,
