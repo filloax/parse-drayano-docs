@@ -2,6 +2,10 @@ const STORAGE_KEY = "OakTrackerData"
 var data = null
 const START_COLLAPSED = true
 
+const STATIC_HIDDEN_GROTTOS = {
+    'Giants Chasm - Route 13': 'Giant Chasm',
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     let dataPath = `data`
     if (typeof getDataPath === 'function') {
@@ -9,26 +13,34 @@ document.addEventListener("DOMContentLoaded", function() {
     } else {
         console.log(`getDataPath function not defined in template, will use ${dataPath} as default`)
     }
-    document.querySelectorAll('.wild-area-table').forEach((table) => {
+    const hiddenGrottoPromise = fetch(`${dataPath}/hidden_grotto.json`).then(response => Promise.resolve(response.json()));
+    Promise.all([...document.querySelectorAll('.wild-area-table')].map((table) => {
         const filename = table.id
-        fetch(`${dataPath}/${filename}.json`).then(response => response.json().then(data => {
-            table.innerHTML = Object.entries(data).map(([location, habitatMap]) => 
-                renderLocationData(location, habitatMap)
+        const subdataPromise = fetch(`${dataPath}/${filename}.json`).then(response => Promise.resolve(response.json()));
+        return Promise.all([subdataPromise, hiddenGrottoPromise]).then(([subdata, hiddenGrottoData]) => {
+            table.innerHTML = Object.entries(subdata).map(([location, habitatMap]) => 
+                renderLocationData(location, habitatMap, hiddenGrottoData)
             ).join('');
             buildLocationTrees();
-    
-            initStorageAndEvents();
-        }));
-    })
-});
+        });
+    })).then(() => {
+        initStorageAndEvents();
+    });
+}, { once: true });
 
 /**
  * @param {string} location 
  * @param {object} habitatMap 
+ * @param {object} hiddenGrottoData 
  * @return {string} html
  */
-function renderLocationData(location, habitatMap) {
-    const pkmnNum = Object.values(habitatMap).map(countHabitatMembers).reduce((prevValue, curValue) => prevValue + curValue, 0)
+function renderLocationData(location, habitatMap, hiddenGrottoData) {
+    const matchingHiddenGrottos = Object.entries(hiddenGrottoData).filter(([hgName, hgData]) => 
+        location.split(/\s*-\s*/)[0].trim() === hgName.split(/\s*-\s*/)[0].trim()
+            || STATIC_HIDDEN_GROTTOS[location] === hgName
+    );
+    const pkmnNum = Object.values(habitatMap).map(countHabitatMembers).reduce(sum, 0)
+        + matchingHiddenGrottos.map(([k, v]) => v).map(countGrottoMembers).reduce(sum, 0);
 
     const locationId = slugify(location) + "-loc-cell"
     const locationCell = /*html*/`<td 
@@ -38,7 +50,7 @@ function renderLocationData(location, habitatMap) {
         >${location}</td>`
     
     let _locFirst = true
-    return Object.entries(habitatMap).map(([habitatName, habitatContent]) => {
+    let output = Object.entries(habitatMap).map(([habitatName, habitatContent]) => {
         const locFirst = _locFirst
         _locFirst = false
 
@@ -97,6 +109,50 @@ function renderLocationData(location, habitatMap) {
             }).join('');
         }
     }).join('');
+
+    matchingHiddenGrottos.forEach(([hgName, hgData]) => {
+        const locFirst = _locFirst
+        _locFirst = false
+        const count = countGrottoMembers(hgData)
+        const grottoId = "hg-" + slugify(hgName) + "-" + slugify(location) + "-hab-cell"
+        const grottoCell = /*html*/`<td 
+            rowspan="${count}" 
+            class="habitat-cell" 
+            id="${grottoId}"
+            data-loc="${locationId}"
+            >Hidden Grotto (${hgName})</td>`;
+
+        let _grottoFirst = true;
+        output += Object.entries(hgData).map(([rarity, mons]) => {
+            const grottoFirst = _grottoFirst;
+            _grottoFirst = false;
+
+            const num = mons.length;
+            const rarityName = rarity.replace(/\s*Encounters/, '');
+            const rarityId = slugify(rarityName) + "-hg-" + slugify(hgName) + "-" + slugify(location) + "-hab-cell"
+            const rarityCell = /*html*/`<td 
+                rowspan="${num}" 
+                class="subcat-cell" 
+                id="${rarityId}"
+                data-loc="${locationId}"
+                data-hab="${grottoId}"
+                >${rarityName}</td>`
+
+            let _first = true
+            return mons.map(monData => {
+                const first = _first
+                _first = false
+
+                return /*html*/`<tr>
+                    ${(locFirst && grottoFirst && first) ? locationCell : ''}
+                    ${(grottoFirst && first) ? grottoCell : ''}
+                    ${(first) ? rarityCell : ''}
+                    <td data-loc="${locationId}" data-hab="${grottoId}" data-sub="${rarityId}" class="poke-cell">${renderHiddenGrottoMonData(monData)}</td>
+                </tr>`
+            }).join('');
+        }).join('');
+    });
+    return output;
 }
 
 /**
@@ -106,10 +162,19 @@ function countHabitatMembers(habitatContent) {
     if (Array.isArray(habitatContent)) {
         return habitatContent.length
     } else {
-        return Object.values(habitatContent).reduce((prevValue, curValue) => {
-            return prevValue + curValue.length
-        }, 0);
+        return Object.values(habitatContent)
+            .map(a => a.length)
+            .reduce(sum, 0);
     }
+}
+
+/**
+ * @param {Object} hiddenGrottoData 
+ */
+function countGrottoMembers(hiddenGrottoData) {
+    return Object.values(hiddenGrottoData)
+        .map(a => a.length)
+        .reduce(sum, 0);
 }
 
 /**
@@ -120,6 +185,19 @@ function renderMonData(monData) {
     ${ monData.pokemon }${monData.chance_pct ? `  (${ monData.chance_pct }%)` : ''}
     </div>
     <input type="checkbox" class="caught-checkbox" name="${monData.pokemon}">
+    `
+}
+
+/**
+ * @param {Object} monData 
+ */
+function renderHiddenGrottoMonData(monData) {
+    const name = (typeof monData === 'string') ? monData : monData.pokemon
+
+    return /*html*/`<div>
+    ${ name }
+    </div>
+    <input type="checkbox" class="caught-checkbox" name="${name.toLowerCase()}">
     `
 }
 
@@ -331,3 +409,5 @@ function slugify(str) {
     .replace(/\s+/g, '-') // replace spaces with hyphens
     .replace(/-+/g, '-'); // remove consecutive hyphens
 }
+
+function sum(a, b) { return a + b }
