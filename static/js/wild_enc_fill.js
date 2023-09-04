@@ -1,5 +1,6 @@
 const STORAGE_KEY = "OakTrackerData"
 var data = null
+const START_COLLAPSED = true
 
 document.addEventListener("DOMContentLoaded", function() {
     let dataPath = `data`
@@ -211,6 +212,8 @@ function visitTree(tree, elementFunction, skipFirst=true) {
     }
 }
 
+var originalElementWidths = {}
+
 function initStorageAndEvents() {
     let strData = localStorage.getItem(STORAGE_KEY)
     if (strData === null) {
@@ -242,24 +245,14 @@ function initStorageAndEvents() {
     });
 
     document.querySelectorAll('.area-cell,.habitat-cell,.subcat-cell').forEach(el => {
-        const collapsedWidth = el.classList.contains('area-cell') ? "4"
-            : el.classList.contains('habitat-cell') ? "3"
-            : el.classList.contains('subcat-cell') ? "2" : "1"
-        const originalWidth = el.colSpan || "1"
-        el.dataset.collapsed = "false"
-        el.classList.add("clickable")
-        el.addEventListener('click', ev => {
-            const collapsed = el.dataset.collapsed == "true"
-            const newCollapsed = !collapsed
-            // document.querySelectorAll(`[data-loc="${el.id}"]`).forEach(child => toggleVisibility(child, newCollapsed))
-            visitTree(elementTrees[el.id], child => toggleVisibility(child, newCollapsed));
-            if (newCollapsed)
-                el.colSpan = collapsedWidth
-            else
-                el.colSpan = originalWidth
+        const originalWidth = el.colSpan || "1";
+        el.dataset.collapsed = "false";
+        el.classList.add("clickable");
+        originalElementWidths[el.id] = originalWidth
 
-            el.dataset.collapsed = String(newCollapsed)
-        });
+        el.addEventListener('click', ev => toggleVisibility(el));
+
+        if (START_COLLAPSED) toggleVisibility(el)
     });
 
     document.getElementById('download').addEventListener('click', () => {
@@ -292,12 +285,33 @@ function initStorageAndEvents() {
     });
 
     document.getElementById('collapse-all').addEventListener('click', () => {
-        document.querySelectorAll('.area-cell').forEach(el => el.click());
+        document.querySelectorAll('.area-cell').forEach(el => toggleVisibility(el));
     });
 }
 
+
 /** @param {HTMLElement} element */
-function toggleVisibility(element, value) {
+function toggleVisibility(element) {
+    const collapsedWidth = element.classList.contains('area-cell') ? "4"
+        : element.classList.contains('habitat-cell') ? "3"
+        : element.classList.contains('subcat-cell') ? "2" : "1"
+        ;
+    const originalWidth = originalElementWidths[element.id]
+
+    const collapsed = element.dataset.collapsed == "true";
+    const newCollapsed = !collapsed;
+    // document.querySelectorAll(`[data-loc="${el.id}"]`).forEach(child => toggleVisibility(child, newCollapsed))
+    visitTree(elementTrees[element.id], child => toggleChildVisibility(child, newCollapsed));
+    if (newCollapsed)
+        element.colSpan = collapsedWidth;
+    else
+        element.colSpan = originalWidth;
+
+    element.dataset.collapsed = String(newCollapsed)
+}
+
+/** @param {HTMLElement} element */
+function toggleChildVisibility(element, value) {
     if (value)
         element.classList.add("hidden")
     else {
