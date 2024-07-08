@@ -1,6 +1,7 @@
 const STORAGE_KEY = "OakTrackerData";
 var data = null;
-var locationPokemon = null;
+/** @type {Record<string, LocationData>} */
+var locationDataMap = null;
 const START_COLLAPSED = true;
 
 const STATIC_HIDDEN_GROTTOS = {
@@ -15,17 +16,17 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log(`getDataPath function not defined in template, will use ${dataPath} as default`)
     }
     const hiddenGrottoPromise = fetch(`${dataPath}/hidden_grotto.json`).then(response => Promise.resolve(response.json()));
-    locationPokemon = {};
+    locationDataMap = {};
     Promise.all([...document.querySelectorAll('.wild-area-table')].map((table) => {
         const filename = table.id
         const subdataPromise = fetch(`${dataPath}/${filename}.json`).then(response => Promise.resolve(response.json()));
         return Promise.all([subdataPromise, hiddenGrottoPromise]).then(([subdata, hiddenGrottoData]) => {
             const entries = Object.entries(subdata);
             entries.forEach(([location, habitatMap]) => {
-                locationPokemon[getLocationId(location)] = filterLocationData(location, habitatMap, hiddenGrottoData);
+                locationDataMap[getLocationId(location)] = initLocationData(location, habitatMap, hiddenGrottoData);
             });
             table.innerHTML = entries.map(([location, _]) => {
-                    const locationData = locationPokemon[getLocationId(location)];
+                    const locationData = locationDataMap[getLocationId(location)];
                     return renderLocationData(location, locationData);
                 }).join('');
             buildLocationTrees();
@@ -35,13 +36,49 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 }, { once: true });
 
+/** @typedef {Record<string, Record<string, Array<HabitatPokemon>> | Array<HabitatPokemon>>} HabitatMap */
+
+class LocationData {
+    /** @type {string} */
+    name;
+    /** @type {HabitatMap} */
+    habitats;
+    /** @type {Record<string, Array<HiddenGrottoPokemon>>} */
+    hiddenGrottos;
+    /** @type {Array<string>} */
+    uniqueAllPokemon;
+}
+
+class HabitatPokemon {
+    /** @type {string} */
+    pokemon;
+    /** @type {number} */
+    chance_pct;
+    /** @type {Array<number>} */
+    level_range;
+    /** @type {string|null} */
+    notes;
+}
+
+class HiddenGrottoPokemon {
+    /** @type {string} */
+    pokemon;
+    /** @type {number} */
+    level;
+    /** @type {boolean} */
+    forcedFirst;
+}
+
 /**
  * @param {string} location 
- * @param {object} habitatMap 
+ * @param {HabitatMap} habitatMap 
  * @param {object} hiddenGrottoData 
  * @return {object}
  */
-function filterLocationData(location, habitatMap, hiddenGrottoData) {
+function initLocationData(location, habitatMap, hiddenGrottoData) {
+    /** @type {LocationData} */
+    const out = {};
+
     const matchingHiddenGrottos = Object.entries(hiddenGrottoData).filter(([hgName, hgData]) => 
             location.split(/\s*-\s*/)[0].trim() === hgName.split(/\s*-\s*/)[0].trim()
                 || STATIC_HIDDEN_GROTTOS[location] === hgName
@@ -60,10 +97,9 @@ function filterLocationData(location, habitatMap, hiddenGrottoData) {
         uniqueAllPokemon.push(name);
     }));
 
-    out = {};
     out.name = location;
     out.habitats = habitatMap;
-    out.matchingHiddenGrottos = matchingHiddenGrottos;
+    out.hiddenGrottos = matchingHiddenGrottos;
     out.uniqueAllPokemon = [...new Set(uniqueAllPokemon)];
     return out;
 }
@@ -74,11 +110,11 @@ function getLocationId(location) {
 
 /**
  * @param {string} location 
- * @param {object} locationData 
+ * @param {LocationData} locationData 
  * @return {string} html
  */
 function renderLocationData(location, locationData) {
-    const matchingHiddenGrottos = locationData.matchingHiddenGrottos;
+    const matchingHiddenGrottos = locationData.hiddenGrottos;
     const habitatMap = locationData.habitats;
     const pkmnNum = Object.values(habitatMap).map(countHabitatMembers).reduce(sum, 0)
         + matchingHiddenGrottos.map(([k, v]) => v).map(countGrottoMembers).reduce(sum, 0);
@@ -86,10 +122,23 @@ function renderLocationData(location, locationData) {
     const locationId = getLocationId(location);
     const locationCell = /*html*/`<td 
         rowspan="${pkmnNum}" 
-        class="area-cell" 
+        class="area-cell tracker-cell" 
         id="${locationId}"
+        data-isloc="true"
         >${location}</td>`;
     
+    const pokeCellBuilder = (monData, habitatId, subcatId, renderer) => /*html*/`<td 
+            data-loc="${locationId}"
+            data-hab="${habitatId}" 
+            ${subcatId ? ("data-sub=\""+subcatId+"\"") : ""}
+            data-isloc="true" 
+            id="${subcatId ? 
+                `${monData.pokemon}-${subcatId}-${habitatId}-${locationId}`
+                : `${monData.pokemon}-${habitatId}-${locationId}`
+            }"
+            class="poke-cell tracker-cell"
+        >${renderer(monData)}</td>`
+
     let _locFirst = true
     let output = Object.entries(habitatMap).map(([habitatName, habitatContent]) => {
         const locFirst = _locFirst
@@ -101,9 +150,10 @@ function renderLocationData(location, locationData) {
         const habitatId = slugify(habitatName) + "-" + slugify(location) + "-hab-cell"
         const habitatCell = /*html*/`<td 
             rowspan="${habitatPkmnNum}" 
-            class="habitat-cell" 
+            class="habitat-cell tracker-cell" 
             id="${habitatId}"
             data-loc="${locationId}"
+            data-isloc="true"
             ${noSubcat ? ` colspan="2"` : ''}
             >${habitatName}</td>`
 
@@ -115,7 +165,7 @@ function renderLocationData(location, locationData) {
                 return /*html*/`<tr>
                     ${(locFirst && first) ? locationCell : ''}
                     ${(first) ? habitatCell : ''}
-                    <td data-loc="${locationId}" data-hab="${habitatId}" class="poke-cell">${renderMonData(monData)}</td>
+                    ${pokeCellBuilder(monData, habitatId, null, renderMonData)}
                 </tr>`
             }).join('');
         } else {
@@ -129,10 +179,11 @@ function renderLocationData(location, locationData) {
                 const subcatId = slugify(habitatName) + "-" + slugify(location) + "-" + slugify(subcatName) + "-sub-cell"
                 const subcatCell = /*html*/`<td 
                     rowspan="${num}" 
-                    class="subcat-cell" 
+                    class="subcat-cell tracker-cell" 
                     id="${subcatId}"
                     data-loc="${locationId}"
                     data-hab="${habitatId}"
+                    data-isloc="true"
                     >${subcatName}</td>`
                 
                 let _first = true
@@ -144,8 +195,8 @@ function renderLocationData(location, locationData) {
                         ${(locFirst && habitatFirst && first) ? locationCell : ''}
                         ${(habitatFirst && first) ? habitatCell : ''}
                         ${(first) ? subcatCell : ''}
-                        <td data-loc="${locationId}" data-hab="${habitatId}" data-sub="${subcatId}" class="poke-cell">${renderMonData(monData)}</td>
-                    </tr>`
+                        ${pokeCellBuilder(monData, habitatId, subcatId, renderMonData)}
+                        </tr>`
                 }).join('');
             }).join('');
         }
@@ -158,7 +209,7 @@ function renderLocationData(location, locationData) {
         const grottoId = "hg-" + slugify(hgName) + "-" + slugify(location) + "-hab-cell"
         const grottoCell = /*html*/`<td 
             rowspan="${count}" 
-            class="habitat-cell" 
+            class="habitat-cell tracker-cell" 
             id="${grottoId}"
             data-loc="${locationId}"
             >Hidden Grotto (${hgName})</td>`;
@@ -173,10 +224,11 @@ function renderLocationData(location, locationData) {
             const rarityId = slugify(rarityName) + "-hg-" + slugify(hgName) + "-" + slugify(location) + "-hab-cell"
             const rarityCell = /*html*/`<td 
                 rowspan="${num}" 
-                class="subcat-cell" 
+                class="subcat-cell tracker-cell" 
                 id="${rarityId}"
                 data-loc="${locationId}"
                 data-hab="${grottoId}"
+                data-isloc="true"
                 >${rarityName}</td>`
 
             let _first = true
@@ -188,7 +240,7 @@ function renderLocationData(location, locationData) {
                     ${(locFirst && grottoFirst && first) ? locationCell : ''}
                     ${(grottoFirst && first) ? grottoCell : ''}
                     ${(first) ? rarityCell : ''}
-                    <td data-loc="${locationId}" data-hab="${grottoId}" data-sub="${rarityId}" class="poke-cell">${renderHiddenGrottoMonData(monData)}</td>
+                    ${pokeCellBuilder(monData, grottoId, rarityId, renderHiddenGrottoMonData)}
                 </tr>`
             }).join('');
         }).join('');
@@ -255,20 +307,20 @@ function isCaught(name) {
     return data[name] == true
 }
 
-var locationTrees = {}
-var elementTrees = {}
+const elementTrees = {}
+const elementTreeParents = {}
 
 function buildLocationTrees() {
     document.querySelectorAll('.area-cell').forEach(loc => {
         const locObj = {};
-        locationTrees[loc.id] = {
+        elementTrees[loc.id] = {
             'element': loc,
             'map': locObj,
         };
-        elementTrees[loc.id] = locationTrees[loc.id];
         document.querySelectorAll(`.habitat-cell[data-loc="${loc.id}"]`).forEach(habitat => {
             let habObj;
             const subcategories = document.querySelectorAll(`.subcat-cell[data-hab="${habitat.id}"]`)
+            elementTreeParents[habitat.id] = loc.id;
 
             if (subcategories.length > 0) {
                 habObj = {};
@@ -297,14 +349,17 @@ function buildLocationTrees() {
                     'list': subcatList,
                 }
                 elementTrees[subcat.id] = habObj[subcat.id];
+                elementTreeParents[subcat.id] = habitat.id;
                 document.querySelectorAll(`.poke-cell[data-sub="${subcat.id}"]`).forEach(poke => {
                     subcatList.push(poke)
+                    elementTreeParents[poke.id] = subcat.id;
                 });
             });
 
             if (subcategories.length == 0) {
                 document.querySelectorAll(`.poke-cell[data-hab="${habitat.id}"]`).forEach(poke => {
                     habObj.push(poke)
+                    elementTreeParents[poke.id] = habitat.id;
                 });
             }
         });
@@ -316,10 +371,14 @@ function applyLoadedData() {
         el.checked = isCaught(el.name)
     });
 
-    Object.keys(locationPokemon).forEach(key => checkCompleted(key));
+    const alreadyChecked = {};
+    document.querySelectorAll(".poke-cell").forEach(checkCompleted, alreadyChecked);
 }
 
 function visitTree(tree, elementFunction, skipFirst=true) {
+    if (typeof tree === 'string' || tree instanceof String) {
+        return visitTree(elementTrees[tree], elementFunction, skipFirst);
+    }
     if (tree instanceof HTMLElement) {
         if (!skipFirst) elementFunction(tree);
     } else if (tree) {
@@ -333,25 +392,41 @@ function visitTree(tree, elementFunction, skipFirst=true) {
     }
 }
 
+function visitTreeReverse(nodeId, elementFunction, skipFirst=true) {
+    const node = elementTrees[nodeId];
+    if (!skipFirst)
+        elementFunction(node.element);
+    if (elementTreeParents[nodeId]) {
+        visitTreeReverse(elementTreeParents[nodeId], elementFunction, false);
+    }
+}
+
 var originalElementWidths = {}
 
 /**
- * @param {string} location 
+ * @param {HTMLElement} pokemonCell 
  */
-function checkCompleted(locationId) {
-    const areaData = locationPokemon[locationId];
-    if (!areaData) return;
+function checkCompleted(pokemonCell, alreadyChecked=null) {
+    visitTreeReverse(pokemonCell.id, /** @param {HTMLElement} element */ element => {
+        if (alreadyChecked && alreadyChecked[element.id]) {
+            return;
+        }
+        if (alreadyChecked)
+            alreadyChecked[element.id] = true;
 
-    /** @type {Array} */
-    const uniqueAllPokemon = areaData.uniqueAllPokemon;
+        const pokemonList = new Set();
+        visitTree(element.id, /** @param {HTMLElement} el2 */ el2 => {
+            if (!el2.classList.contains("poke-cell")) return;
 
-    const completed = uniqueAllPokemon.every(name => isCaught(name))
-
-    document.querySelectorAll(`#${locationId}`).forEach(cell => {
-        if (completed) 
-            cell.classList.add("completed");
-        else 
-            cell.classList.remove("completed");
+            const checkbox = el2.querySelector("input.caught-checkbox")
+            const name = checkbox.name;
+            pokemonList.add(name);
+        });
+        if ([...pokemonList].every(isCaught)) {
+            element.classList.add("completed")
+        } else {
+            element.classList.remove("completed")
+        }
     });
 }
 
@@ -374,7 +449,7 @@ function initStorageAndEvents() {
         el.innerHTML = /*html*/`<div class="sticky"><h3>${content}</h3></div>`
     });
     document.querySelectorAll('input.caught-checkbox').forEach(el => {
-        el.checked = isCaught(el.name)
+        el.checked = isCaught(el.name);
 
         el.addEventListener('change', ev => {
             const name = el.name
@@ -383,7 +458,8 @@ function initStorageAndEvents() {
                 el2.checked = el.checked
             });
             const parent = el.parentElement;
-            checkCompleted(parent.dataset.loc);
+            console.log("CHANGED", name, parent);
+            checkCompleted(parent, {});
         });
     });
 
@@ -431,7 +507,8 @@ function initStorageAndEvents() {
         document.querySelectorAll('.area-cell').forEach(el => toggleVisibility(el));
     });
 
-    Object.keys(locationPokemon).forEach(key => checkCompleted(key));
+    const alreadyChecked = {};
+    document.querySelectorAll(".poke-cell").forEach(checkCompleted, alreadyChecked);
 }
 
 
