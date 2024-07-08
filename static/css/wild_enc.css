@@ -13,6 +13,12 @@ body {
 .area-cell h2 {
     font-size: 32px;
 }
+.area-cell.completed {
+    background-color: #0f0f0f;
+}
+.area-cell.completed * {
+    text-decoration: line-through;
+}
 
 table {
     border-collapse: collapse;

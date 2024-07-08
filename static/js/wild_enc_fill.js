@@ -1,6 +1,7 @@
-const STORAGE_KEY = "OakTrackerData"
-var data = null
-const START_COLLAPSED = true
+const STORAGE_KEY = "OakTrackerData";
+var data = null;
+var locationPokemon = null;
+const START_COLLAPSED = true;
 
 const STATIC_HIDDEN_GROTTOS = {
     'Giants Chasm - Route 13': 'Giant Chasm',
@@ -14,13 +15,19 @@ document.addEventListener("DOMContentLoaded", function() {
         console.log(`getDataPath function not defined in template, will use ${dataPath} as default`)
     }
     const hiddenGrottoPromise = fetch(`${dataPath}/hidden_grotto.json`).then(response => Promise.resolve(response.json()));
+    locationPokemon = {};
     Promise.all([...document.querySelectorAll('.wild-area-table')].map((table) => {
         const filename = table.id
         const subdataPromise = fetch(`${dataPath}/${filename}.json`).then(response => Promise.resolve(response.json()));
         return Promise.all([subdataPromise, hiddenGrottoPromise]).then(([subdata, hiddenGrottoData]) => {
-            table.innerHTML = Object.entries(subdata).map(([location, habitatMap]) => 
-                renderLocationData(location, habitatMap, hiddenGrottoData)
-            ).join('');
+            const entries = Object.entries(subdata);
+            entries.forEach(([location, habitatMap]) => {
+                locationPokemon[getLocationId(location)] = filterLocationData(location, habitatMap, hiddenGrottoData);
+            });
+            table.innerHTML = entries.map(([location, _]) => {
+                    const locationData = locationPokemon[getLocationId(location)];
+                    return renderLocationData(location, locationData);
+                }).join('');
             buildLocationTrees();
         });
     })).then(() => {
@@ -32,22 +39,56 @@ document.addEventListener("DOMContentLoaded", function() {
  * @param {string} location 
  * @param {object} habitatMap 
  * @param {object} hiddenGrottoData 
+ * @return {object}
+ */
+function filterLocationData(location, habitatMap, hiddenGrottoData) {
+    const matchingHiddenGrottos = Object.entries(hiddenGrottoData).filter(([hgName, hgData]) => 
+            location.split(/\s*-\s*/)[0].trim() === hgName.split(/\s*-\s*/)[0].trim()
+                || STATIC_HIDDEN_GROTTOS[location] === hgName
+        );
+    const uniqueAllPokemon = [];
+    Object.values(habitatMap).forEach(habitatContent => {
+        const noSubcat = Array.isArray(habitatContent)
+        if (noSubcat) {
+            habitatContent.forEach(monData => uniqueAllPokemon.push(monData.pokemon));
+        } else {
+            Object.values(habitatContent).forEach(subcatContent => subcatContent.forEach(monData => uniqueAllPokemon.push(monData.pokemon)));
+        }
+    });
+    Object.values(matchingHiddenGrottos).forEach(hgData => Object.values(hgData).forEach((monData) => {
+        const name = (typeof monData === 'string') ? monData : monData.pokemon
+        uniqueAllPokemon.push(name);
+    }));
+
+    out = {};
+    out.name = location;
+    out.habitats = habitatMap;
+    out.matchingHiddenGrottos = matchingHiddenGrottos;
+    out.uniqueAllPokemon = [...new Set(uniqueAllPokemon)];
+    return out;
+}
+
+function getLocationId(location) {
+    return slugify(location) + "-loc-cell";
+}
+
+/**
+ * @param {string} location 
+ * @param {object} locationData 
  * @return {string} html
  */
-function renderLocationData(location, habitatMap, hiddenGrottoData) {
-    const matchingHiddenGrottos = Object.entries(hiddenGrottoData).filter(([hgName, hgData]) => 
-        location.split(/\s*-\s*/)[0].trim() === hgName.split(/\s*-\s*/)[0].trim()
-            || STATIC_HIDDEN_GROTTOS[location] === hgName
-    );
+function renderLocationData(location, locationData) {
+    const matchingHiddenGrottos = locationData.matchingHiddenGrottos;
+    const habitatMap = locationData.habitats;
     const pkmnNum = Object.values(habitatMap).map(countHabitatMembers).reduce(sum, 0)
         + matchingHiddenGrottos.map(([k, v]) => v).map(countGrottoMembers).reduce(sum, 0);
 
-    const locationId = slugify(location) + "-loc-cell"
+    const locationId = getLocationId(location);
     const locationCell = /*html*/`<td 
         rowspan="${pkmnNum}" 
         class="area-cell" 
         id="${locationId}"
-        >${location}</td>`
+        >${location}</td>`;
     
     let _locFirst = true
     let output = Object.entries(habitatMap).map(([habitatName, habitatContent]) => {
@@ -274,12 +315,14 @@ function applyLoadedData() {
     document.querySelectorAll('input.caught-checkbox').forEach(el => {
         el.checked = isCaught(el.name)
     });
+
+    Object.keys(locationPokemon).forEach(key => checkCompleted(key));
 }
 
 function visitTree(tree, elementFunction, skipFirst=true) {
     if (tree instanceof HTMLElement) {
         if (!skipFirst) elementFunction(tree);
-    } else {
+    } else if (tree) {
         if (!skipFirst) elementFunction(tree.element);
         if (tree.map) {
             Object.values(tree.map).forEach(child => visitTree(child, elementFunction, false));
@@ -291,6 +334,26 @@ function visitTree(tree, elementFunction, skipFirst=true) {
 }
 
 var originalElementWidths = {}
+
+/**
+ * @param {string} location 
+ */
+function checkCompleted(locationId) {
+    const areaData = locationPokemon[locationId];
+    if (!areaData) return;
+
+    /** @type {Array} */
+    const uniqueAllPokemon = areaData.uniqueAllPokemon;
+
+    const completed = uniqueAllPokemon.every(name => isCaught(name))
+
+    document.querySelectorAll(`#${locationId}`).forEach(cell => {
+        if (completed) 
+            cell.classList.add("completed");
+        else 
+            cell.classList.remove("completed");
+    });
+}
 
 function initStorageAndEvents() {
     let strData = localStorage.getItem(STORAGE_KEY)
@@ -315,10 +378,12 @@ function initStorageAndEvents() {
 
         el.addEventListener('change', ev => {
             const name = el.name
-            setCaught(name, el.checked)
+            setCaught(name, el.checked);
             document.querySelectorAll('input.caught-checkbox[name=' + name + ']').forEach(el2 => {
                 el2.checked = el.checked
             });
+            const parent = el.parentElement;
+            checkCompleted(parent.dataset.loc);
         });
     });
 
@@ -365,6 +430,8 @@ function initStorageAndEvents() {
     document.getElementById('collapse-all').addEventListener('click', () => {
         document.querySelectorAll('.area-cell').forEach(el => toggleVisibility(el));
     });
+
+    Object.keys(locationPokemon).forEach(key => checkCompleted(key));
 }
 
 
