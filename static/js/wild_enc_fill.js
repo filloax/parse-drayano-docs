@@ -372,7 +372,7 @@ function applyLoadedData() {
     });
 
     const alreadyChecked = {};
-    document.querySelectorAll(".poke-cell").forEach(checkCompleted, alreadyChecked);
+    document.querySelectorAll(".poke-cell").forEach(updateCompleted, alreadyChecked);
 }
 
 function visitTree(tree, elementFunction, skipFirst=true) {
@@ -406,7 +406,7 @@ var originalElementWidths = {}
 /**
  * @param {HTMLElement} pokemonCell 
  */
-function checkCompleted(pokemonCell, alreadyChecked=null) {
+function updateCompleted(pokemonCell, alreadyChecked=null) {
     visitTreeReverse(pokemonCell.id, /** @param {HTMLElement} element */ element => {
         if (alreadyChecked && alreadyChecked[element.id]) {
             return;
@@ -428,6 +428,30 @@ function checkCompleted(pokemonCell, alreadyChecked=null) {
             element.classList.remove("completed")
         }
     });
+
+    const locId = pokemonCell.dataset["loc"];
+    const locElement = document.getElementById(locId);
+    const locationData = locationDataMap[locId];
+    const pctComplete = locationData.uniqueAllPokemon.map(x => isCaught(x) ? 1 : 0).reduce((x, y) => x + y, 0) / locationData.uniqueAllPokemon.length;
+    locElement.dataset["completepct"] = Number(pctComplete).toLocaleString(undefined, {style: 'percent'});
+    updateCompletedPercent(locElement);
+}
+
+/** @param {HTMLElement} areaElement */
+function updateCompletedPercent(areaElement) {
+    const h2el = areaElement.querySelector("h2")
+    const h2elSpan = h2el.querySelector("span")
+    if (areaElement.dataset["collapsed"] === "true") {
+        if (!h2elSpan) {
+            const newSpan = document.createElement("span");
+            newSpan.innerText = `[${areaElement.dataset["completepct"]}]`;
+            h2el.appendChild(newSpan);
+        } else {
+            h2elSpan.innerText = `[${areaElement.dataset["completepct"]}]`;
+        }
+    } else if (areaElement.dataset["collapsed"] !== "true" && h2elSpan) {
+        h2el.removeChild(h2elSpan)
+    }
 }
 
 function initStorageAndEvents() {
@@ -459,7 +483,7 @@ function initStorageAndEvents() {
             });
             const parent = el.parentElement;
             console.log("CHANGED", name, parent);
-            checkCompleted(parent, {});
+            updateCompleted(parent, {});
         });
     });
 
@@ -508,7 +532,7 @@ function initStorageAndEvents() {
     });
 
     const alreadyChecked = {};
-    document.querySelectorAll(".poke-cell").forEach(checkCompleted, alreadyChecked);
+    document.querySelectorAll(".poke-cell").forEach(updateCompleted, alreadyChecked);
 }
 
 
@@ -529,7 +553,11 @@ function toggleVisibility(element) {
     else
         element.colSpan = originalWidth;
 
-    element.dataset.collapsed = String(newCollapsed)
+    element.dataset.collapsed = String(newCollapsed);
+
+    if (element.classList.contains('area-cell')) {
+        updateCompletedPercent(element);
+    }
 }
 
 /** @param {HTMLElement} element */
