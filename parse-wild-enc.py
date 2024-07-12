@@ -280,7 +280,7 @@ def set_hardcoded_entries(data: dict):
     data['Route 5']['Guaranteed Encounters'] = [{
         'pokemon': 'Stantler',
         'level': 30,
-        'forced-first': True,
+        'forcedFirst': True,
     }]
 
 def parse_hidden_grotto_entry(entry: str):

@@ -4,7 +4,7 @@
       {
         "pokemon": "Stantler",
         "level": 30,
-        "forced-first": true
+        "forcedFirst": true
       }
     ],
     "Common Encounters": [
